@@ -1,17 +1,17 @@
 # Project Reflection
 
-This document covers the real challenges I ran into while building and hardening this network scanner, how I diagnosed them, and what I'd do differently next time. Most of this project didn't go wrong at the "write the code" stage — it went wrong (and got interesting) at the "verify the code actually does what it claims" stage.
+This document covers the real challenges I ran into while building and hardening this network scanner, how I diagnosed them, and what I'd do differently next time. Most of this project didn't go wrong at the "write the code" stage — it went wrong (and got interesting) at the "verify the code and if it actually does what it claims" stage.
 
 ## 1. Discovering that "done" didn't always mean done
 
-The project started from notes describing work completed in an earlier session with a senior developer friend. Early on, I assumed everything listed there was already implemented and just needed light verification. That assumption turned out to be wrong in several places:
+Early on, I assumed that everything was done and implemented according to what I can recall, I did not check or verify anything. That assumption turned out to be wrong in several places:
 
-- A `.env` file for network configuration was described as created — it didn't exist. The actual network range had been placed in `scanner.conf` instead, and the `.env` language in the notes just didn't match what was really built.
-- `git` wasn't installed on the machine at all, despite `.gitignore` protections being described as already in place.
+- A `.env` file for network configuration which I thought was created — it didn't exist. The actual network range had been placed in `scanner.conf` instead.
+- `git` wasn't installed on the machine at all, despite `.gitignore` protections being already in place.
 - `curl` wasn't installed either, which I only discovered when trying to verify the dashboard was reachable.
-- The git repository itself had never been initialized — there was no version control protecting sensitive files, despite that being listed as complete.
+- The git repository itself had never been initialized — there was no version control protecting sensitive files.
 
-**What I learned:** a description of work is not the same as verification of work. From that point on, I stopped trusting "this was already fixed" and started running a command to check, every time. This became the actual theme of the whole project — not writing new code, but confirming claimed state against real state.
+**What I learned:** work done is not the same as verification of work. From that point on, I stopped relying on "this was already done" and started running a command to check, every time. This became the actual theme of the whole project — not writing new code, but confirming work done against real state.
 
 ## 2. The `umask 002` permission leak
 
@@ -34,7 +34,7 @@ This has a classic time-of-check-to-time-of-use (TOCTOU) race: two near-simultan
 
 **Fix:** replaced the check-then-create pattern with an atomic `mkdir`-based lock. `mkdir` fails immediately if the directory already exists, so the check and the creation happen as a single atomic operation instead of two separate steps that can race.
 
-**What I learned:** "it probably won't happen often" isn't the same as "it's correct." Atomic operations exist specifically to remove this class of bug, and it's worth using them even when the failure window seems small.
+**What I learned:** "it probably won't happen often" isn't the same as "it's correct and won't happen." Atomic operations exist specifically to remove this class of bug, and it's worth using them even when the failure window seems small.
 
 ## 4. The risk-level bug: the most interesting one
 
