@@ -42,7 +42,7 @@ sudo apt install nmap python3 sqlite3 apache2 php libapache2-mod-php php-sqlite3
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url> netscan
+git clone https://github.com/henryylim01/network-scan-dashboard.git netscan
 cd netscan
 ```
 
